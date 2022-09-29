@@ -12,12 +12,7 @@ function jsonResponse(data) {
   });
 }
 
-router.get("", async () => {
-  const holidays = await getHolidays();
-  return jsonResponse(holidays);
-});
-
-router.post("/send-slack-message", async () => {
+async function sendSlackMessage() {
   const holidays = await getHolidays();
   const message = prepareSlackMessage(holidays);
   await fetch(SLACK_HOOK_URL, {
@@ -25,6 +20,15 @@ router.post("/send-slack-message", async () => {
     body: JSON.stringify(message),
     headers: { "Content-Type": "application/json" },
   });
+}
+
+router.get("", async () => {
+  const holidays = await getHolidays();
+  return jsonResponse(holidays);
+});
+
+router.post("/send-slack-message", async () => {
+  await sendSlackMessage();
   return new Response("Succesfully posted to Slack!");
 });
 
@@ -36,7 +40,11 @@ router.get("/:day", async ({ params }) => {
 // 404 for everything else
 router.all("*", () => new Response("Not Found.", { status: 404 }));
 
+addEventListener("scheduled", (event) => {
+  event.waitUntil(sendSlackMessage());
+});
+
 // attach the router "handle" to the event handler
-addEventListener("fetch", (event: FetchEvent) =>
+addEventListener("fetch", (event) =>
   event.respondWith(router.handle(event.request))
 );

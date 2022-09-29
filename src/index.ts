@@ -27,9 +27,13 @@ router.get("", async () => {
   return jsonResponse(holidays);
 });
 
-router.post("/send-slack-message", async () => {
-  await sendSlackMessage();
-  return new Response("Succesfully posted to Slack!");
+router.post("/send-slack-message", async ({ query }) => {
+  if (query.token === MESSAGE_TOKEN) {
+    await sendSlackMessage();
+    return new Response("Succesfully posted to Slack!");
+  } else {
+    return new Response("Not authorized", { status: 401 });
+  }
 });
 
 router.get("/:day", async ({ params }) => {

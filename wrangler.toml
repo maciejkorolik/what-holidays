@@ -5,6 +5,7 @@ compatibility_date = "2022-09-29"
 [vars]
 # The necessary secrets are:
 # - SLACK_HOOK_URL
+# - MESSAGE_TOKEN
 
 [triggers]
 crons = ["0 6 * * *"]

@@ -8,6 +8,6 @@ This is a simple app that shows what strange holidays are in Poland in a specifi
 
 - `GET /` - returns an array of today's holidays
 - `GET /:day` - returns an array of holidays for a specified day. **NOTE:** for now the day should be written in Polish in following format: e.g. 22-wrzesnia)
-- `POST /send-slack-message` - sends a message to Slack with a list of holidays for today
+- `POST /send-slack-message?token=<message_token>` - sends a message to Slack with a list of holidays for today (needs token so that no one spams our slack)
 
 There is also a CRON job that sends a Slack message every day in the morning.

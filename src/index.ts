@@ -1,5 +1,6 @@
 import { Router } from "itty-router";
 import getHolidays from "./getHolidays";
+import prepareSlackMessage from "./prepareSlackMessage";
 
 const router = Router();
 
@@ -14,6 +15,17 @@ function jsonResponse(data) {
 router.get("", async () => {
   const holidays = await getHolidays();
   return jsonResponse(holidays);
+});
+
+router.post("/send-slack-message", async () => {
+  const holidays = await getHolidays();
+  const message = prepareSlackMessage(holidays);
+  await fetch(SLACK_HOOK_URL, {
+    method: "post",
+    body: JSON.stringify(message),
+    headers: { "Content-Type": "application/json" },
+  });
+  return new Response("Succesfully posted to Slack!");
 });
 
 router.get("/:day", async ({ params }) => {

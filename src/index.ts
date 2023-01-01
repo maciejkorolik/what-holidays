@@ -44,10 +44,6 @@ router.get("/:day", async ({ params }) => {
 // 404 for everything else
 router.all("*", () => new Response("Not Found.", { status: 404 }));
 
-addEventListener("scheduled", (event) => {
-  event.waitUntil(sendSlackMessage());
-});
-
 // attach the router "handle" to the event handler
 addEventListener("fetch", (event) =>
   event.respondWith(router.handle(event.request))

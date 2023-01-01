@@ -8,4 +8,4 @@ compatibility_date = "2022-09-29"
 # - MESSAGE_TOKEN
 
 [triggers]
-crons = ["0 6 * * *"]
+crons = []

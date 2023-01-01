@@ -9,7 +9,9 @@ export default function prepareSlackMessage(holidays: Holiday[]) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: "*Holidays for today:*",
+          text: holidays.length
+            ? "*Holidays for today:*"
+            : "Sorry, there are no holidays today :sadeg:",
         },
       },
       {

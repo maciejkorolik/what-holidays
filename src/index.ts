@@ -1,8 +1,11 @@
-import { Router } from "itty-router";
+import { Router, Request } from "itty-router";
+import qs from "qs";
 import getHolidays from "./getHolidays";
 import prepareSlackMessage from "./prepareSlackMessage";
 
 const router = Router();
+
+const allowedChannels = JSON.parse(ALLOWED_CHANNELS);
 
 function jsonResponse(data) {
   return new Response(JSON.stringify(data), {
@@ -12,24 +15,20 @@ function jsonResponse(data) {
   });
 }
 
-async function sendSlackMessage() {
-  const holidays = await getHolidays();
-  const message = prepareSlackMessage(holidays);
-  await fetch(SLACK_HOOK_URL, {
-    method: "post",
-    body: JSON.stringify(message),
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
 router.get("", async () => {
   const holidays = await getHolidays();
   return jsonResponse(holidays);
 });
 
-router.post("/send-slack-message", async ({ query }) => {
-  if (query.token === MESSAGE_TOKEN) {
-    await sendSlackMessage();
+router.post("/send-slack-message", async (request: Request) => {
+  if (request.query.token === MESSAGE_TOKEN) {
+    const body = await request.text();
+    const params = qs.parse(body);
+    const holidays = await getHolidays();
+    const channelId = params?.channel_id || null;
+    const shouldDisplayInChannel = allowedChannels.includes(channelId);
+    const message = prepareSlackMessage(holidays, shouldDisplayInChannel);
+    return jsonResponse(message);
   } else {
     return new Response("Not authorized", { status: 401 });
   }
